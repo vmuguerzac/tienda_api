@@ -8,6 +8,7 @@ import com.vmuguerza.tienda_api.modelo.Producto;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 @Repository 
 public class ProductoEMDAO {
@@ -25,7 +26,7 @@ public class ProductoEMDAO {
         """;
         return entityManager.createQuery(query, Producto.class).getResultList();
     }
-
+    @Transactional 
     public Producto guardarProducto(Producto producto){
         if(producto.getId() == null){
             // Guardar
@@ -35,7 +36,7 @@ public class ProductoEMDAO {
             return entityManager.merge(producto); // UPDATE
         }
     }
-
+    @Transactional
     public void eliminarProducto(Long id){
         Producto producto = buscarPorId(id); // BUSCAR
         if(producto != null){
