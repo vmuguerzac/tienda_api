@@ -3,8 +3,6 @@ package com.vmuguerza.tienda_api.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.query.sqm.CastType;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
