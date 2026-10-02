@@ -14,6 +14,7 @@ public interface ProductoRepository extends
     List<Producto> findByNombreProducto(String nombre);
     // Query para buscar productos que tengan un monto mayor al parametro
     List<Producto> findByPrecioGreaterThan(BigDecimal precio);
+    List<Producto> findByCategoriaIdOrderByIdAsc(Long categoriaId);
 
     @Query("""
             SELECT p 

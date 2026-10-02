@@ -12,6 +12,7 @@ import com.vmuguerza.tienda_api.repositorio.CategoriaEMDAO;
 import com.vmuguerza.tienda_api.repositorio.CategoriaRepository;
 import com.vmuguerza.tienda_api.repositorio.ProductoEMDAO;
 import com.vmuguerza.tienda_api.repositorio.ProductoRepository;
+import com.vmuguerza.tienda_api.servicios.ProductoService;
 
 @Component 
 public class DataLoader implements CommandLineRunner {
@@ -22,20 +23,25 @@ public class DataLoader implements CommandLineRunner {
     // Repository
     private final CategoriaRepository categoriaRepository;
     private final ProductoRepository productoRepository;
+    //Service
+    private final ProductoService productoService;
 
     // Constructor
     public DataLoader(ProductoEMDAO productoDAO, CategoriaEMDAO categoriaDAO, 
-        CategoriaRepository categoriaRepository, ProductoRepository productoRepository){
+        CategoriaRepository categoriaRepository, ProductoRepository productoRepository,
+        ProductoService productoService){
         this.productoDAO = productoDAO;
         this.categoriaDAO = categoriaDAO;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.productoService = productoService;
     }
 
     @Override
     public void run(String... args) throws Exception {
         probarDAO();
         probarRepository();
+        probarTransactional();
 
     }
 
@@ -48,15 +54,35 @@ public class DataLoader implements CommandLineRunner {
         categoriaDAO.guardarCategoria(cat1);
         System.out.println("Categoria guardada con el ID: " + cat1.getId());
         
-        // Crear producto
         Producto prod1 = new Producto();
-        prod1.setNombreProducto("Audífonos Inalámbricos");
+        prod1.setNombreProducto("Audífonos con cable");
         prod1.setDescripcion("Estos audífonos son de alta fidelidad con sonido claro.");
-        prod1.setPrecio(new BigDecimal(199.90));
+        prod1.setPrecio(new BigDecimal(200.00));
         prod1.setSinStock(false);
         prod1.setImagenProducto("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.-9Mnt3gM1lzXw-x5JZ6begHaHa%3Fpid%3DApi&f=1&ipt=e119ecafd607b9f8b10e5822d3f608f167568caaf6ad1287428389ade920b9f8");
         prod1.setCategoria(cat1);
         productoDAO.guardarProducto(prod1);
+        System.out.println("Producto guardado con el ID: " + prod1.getId());
+
+        // Crear producto
+        prod1 = new Producto();
+        prod1.setNombreProducto("Audífonos Inalámbricos");
+        prod1.setDescripcion("Estos audífonos son de alta fidelidad con sonido claro.");
+        prod1.setPrecio(new BigDecimal(19.90));
+        prod1.setSinStock(false);
+        prod1.setImagenProducto("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.-9Mnt3gM1lzXw-x5JZ6begHaHa%3Fpid%3DApi&f=1&ipt=e119ecafd607b9f8b10e5822d3f608f167568caaf6ad1287428389ade920b9f8");
+        prod1.setCategoria(cat1);
+        productoDAO.guardarProducto(prod1);
+        System.out.println("Producto guardado con el ID: " + prod1.getId());
+
+        prod1 = new Producto();
+        prod1.setNombreProducto("Telefono Huawei p500");
+        prod1.setDescripcion("Celular de gran performance.");
+        prod1.setPrecio(new BigDecimal(500.00));
+        prod1.setSinStock(false);
+        prod1.setImagenProducto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmsQA4b_YpcKQibhOEcPe8fLXr7u-S0u29CzuLVhGKaXvqh13zTXh6JVuF&s=10");
+        prod1.setCategoria(cat1);
+        productoRepository.save(prod1);
         System.out.println("Producto guardado con el ID: " + prod1.getId());
 
         // Lectura
@@ -92,6 +118,8 @@ public class DataLoader implements CommandLineRunner {
         prod2.setCategoria(cat2);
         productoRepository.save(prod2);
         System.out.println("Producto guardado con el ID: " + prod2.getId());
+
+
         // Categoria obtener todos
         categoriaRepository.findAll().forEach(categoria->
             System.out.println("Categoria: " + categoria.getId() + " - " + categoria.getNombreCategoria())
@@ -114,7 +142,23 @@ public class DataLoader implements CommandLineRunner {
                 .forEach(producto->
                     System.out.println("Encontrado: " + producto.getNombreProducto())
                 );
-        
+    }
+    private void probarTransactional(){
+        System.out.println("================ Uso de Transactional ============");
+        List<Producto> productos = productoRepository.findAll();
+        productos.forEach(prod->
+            System.out.println("Producto: " + prod.getNombreProducto() + " " + prod.getPrecio())
+        );
+        try{
+            productoService.aplicarDescuentoACategoria(
+                productos.get(0).getCategoria().getId(), 98);
+        }catch(IllegalArgumentException ex){
+            System.err.println("Error capturado: " + ex.getMessage());
+        }
+        System.out.println("Productos tras el fallo: ");
+        productos.forEach(prod->
+            System.out.println("Producto: " + prod.getNombreProducto() + " " + prod.getPrecio())
+        );
 
     }
 }
