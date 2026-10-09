@@ -49,9 +49,11 @@ public class ProductoEMDAO {
         String query = """
                 SELECT p 
                 FROM Producto p
-                WHERE p.nombre LIKE :nombre
+                WHERE p.nombreProducto LIKE :nombre
         """;
-        return entityManager.createQuery(query).setParameter("nombre", "%" + nombre + "%").getResultList();
+        return entityManager.createQuery(query, Producto.class)
+            .setParameter("nombre", "%" + nombre + "%")
+            .getResultList();
 
     }
 

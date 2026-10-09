@@ -156,6 +156,7 @@ public class DataLoader implements CommandLineRunner {
             System.err.println("Error capturado: " + ex.getMessage());
         }
         System.out.println("Productos tras el fallo: ");
+        productos = productoRepository.findAll();
         productos.forEach(prod->
             System.out.println("Producto: " + prod.getNombreProducto() + " " + prod.getPrecio())
         );
